@@ -28,7 +28,7 @@ module JWT
     merged_options = DEFAULT_OPTIONS.merge(custom_options)
 
     decoder = Decode.new jwt, verify
-    header, payload, signature, signing_input = decoder.decode_segments
+    header, payload, signature, signing_input = decoder.decode_segments(custom_options)
     decode_verify_signature(key, header, payload, signature, signing_input, merged_options, &keyfinder) if verify
 
     Verify.verify_claims(payload, merged_options) if verify

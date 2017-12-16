@@ -21,9 +21,9 @@ module JWT
       @signature = ''
     end
 
-    def decode_segments
+    def decode_segments(decode_payload_options)
       header_segment, payload_segment, crypto_segment = raw_segments
-      @header, @payload = decode_header_and_payload(header_segment, payload_segment)
+      @header, @payload = decode_header_and_payload(header_segment, payload_segment, decode_payload_options)
       @signature = Decode.base64url_decode(crypto_segment.to_s) if @verify
       signing_input = [header_segment, payload_segment].join('.')
       [@header, @payload, @signature, signing_input]
@@ -38,9 +38,9 @@ module JWT
       segments
     end
 
-    def decode_header_and_payload(header_segment, payload_segment)
+    def decode_header_and_payload(header_segment, payload_segment, decode_payload_options)
       header = JSON.parse(Decode.base64url_decode(header_segment))
-      payload = JSON.parse(Decode.base64url_decode(payload_segment))
+      payload = JSON.parse(Decode.base64url_decode(payload_segment), decode_payload_options)
       [header, payload]
     rescue JSON::ParserError
       raise JWT::DecodeError, 'Invalid segment encoding'
